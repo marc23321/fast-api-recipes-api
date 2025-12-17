@@ -7,13 +7,18 @@ from database import create_db_and_tables, SessionDep
 from fastapi.security import HTTPBearer,HTTPAuthorizationCredentials, OAuth2PasswordBearer
 from models import Users
 from sqlmodel import select
+import os
+from dotenv import load_dotenv
+
 
 security = HTTPBearer()
 
 
-SECRET_KEY = "070cdbe84fe12adab2b34bde137f85e6f8a9842f062631de4c940974805c77a0"
-ALGORITHM = "HS256"
-ACCESS_TOKENS_EXPIRE_MINUTES = 120
+SECRET_KEY = os.getenv("SECRET KEY")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
+ACCESS_TOKENS_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKENS_EXPIRE_MINUTES", 120))
+# ALGORITHM = "HS256"
+# ACCESS_TOKENS_EXPIRE_MINUTES = 120
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -38,6 +43,7 @@ def decode_access_token(token:str):
         return payload
     except JWTError:
         return None
+
     
 def get_current_user( session:SessionDep, credentials: HTTPAuthorizationCredentials = Depends(security)):
     if not credentials:
